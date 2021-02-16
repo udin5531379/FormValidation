@@ -9,60 +9,95 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @State var validation = Validation()
+    @ObservedObject var validation = Validation()
     @State var showDatePicker: Bool = false
     var body: some View {
-        ZStack {
-            VStack{
-                EntryField(text: $validation.email, placeholder: "Email", isSecure: false)
-                EntryField(text: $validation.password, placeholder: "Password", isSecure: true)
-                EntryField(text: $validation.retypePassword, placeholder: "Re-type Password", isSecure: true)
-                
-                
-                
-                HStack {
+        NavigationView {
+            VStack {
+                ZStack {
+                    VStack{
+                        EntryField(text: $validation.email, results: validation.validEmail(), placeholder: "Email", isSecure: false)
+                        EntryField(text: $validation.password, results: validation.validPassword(), placeholder: "Password", isSecure: true)
+                        EntryField(text: $validation.retypePassword, results: validation.doesPasswordMatchString(), placeholder: "Re-type Password", isSecure: true)
+                        VStack {
+                            HStack {
+                                Text("Birth Year: ")
+                                    .fontWeight(.bold)
+                                
+                                Button(action: {
+                                    withAnimation(.linear(duration: 0.15)) {
+                                        showDatePicker.toggle()
+                                    }
+                                }, label: {
+                                    Text(String(validation.chosenDate))
+                            })
+                            }.frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                            .padding(.top)
+                            
+                            if !validation.isUserOfSuitableAge(){
+                                Text("Must be 18 or older")
+                            }
+                            
+                        }
+                        
+                        
+                        
+                     }
                     
-                    Text("Birth Year: ")
-                        .fontWeight(.bold)
-                    
-                    Button(action: {
-                        showDatePicker.toggle()
-                    }, label: {
-                        Text(String(validation.currentDate))
-                })
-                }.frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
+                    if showDatePicker{
+                        VStack{
+                            DatePicker(isDatePickerShown: $showDatePicker, selectedCurrentDate: $validation.chosenDate)
+                                .shadow(color: .black, radius: 10, x: 10.0, y: 5.0)
+                            }.frame(width: 200, height: 200)
+                    }
+                }
                 
-                
-                
-             }
+                Spacer()
             
-            if showDatePicker{
-                VStack{
-                    DatePicker(isDatePickerShown: $showDatePicker, currentDate: $validation.currentDate)
-                        .shadow(color: .black, radius: 10, x: 10.0, y: 5.0)
-                }.frame(width: 200, height: 200)
-            }
+            }.navigationTitle("Form Validation")
+            .navigationBarTitleDisplayMode(.large)
         }
          
     }
 }
 
 struct EntryField: View {
+    @ObservedObject var validation = Validation()
     @Binding var text: String
+    var results : String = ""
     var placeholder: String
     var isSecure: Bool
     var body: some View {
         VStack{
             
             if isSecure {
-                SecureField(placeholder, text: $text)
-                    .padding()
-                    .foregroundColor(.primary)
+                VStack(alignment: .leading) {
+                    SecureField(placeholder, text: $text)
+                        .padding()
+                        .foregroundColor(.primary)
+                    
+                        Text(text.isEmpty ? "" : results)
+                            .padding(.horizontal)
+                            .animation(.spring())
+                            .foregroundColor(Color.red)
+                    
+                    
+                        
+                }
             } else {
-                TextField(placeholder, text: $text)
-                    .padding()
-                    .foregroundColor(.primary)
+                VStack(alignment: .leading){
+                    TextField(placeholder, text: $text)
+                        .padding()
+                        .foregroundColor(.primary)
+                        .autocapitalization(.none)
+                    
+                    Text(text.isEmpty ? "" : results)
+                        .padding(.horizontal)
+                        .animation(.spring())
+                        .foregroundColor(Color.red)
+                }
+                
             }
         }
     }
@@ -70,7 +105,8 @@ struct EntryField: View {
 
 struct DatePicker: View {
     @Binding var isDatePickerShown: Bool
-    @Binding var currentDate: Int
+    @Binding var selectedCurrentDate: Int
+    @ObservedObject var validation = Validation()
     let year = Calendar.current.component(.year, from: Date())
     var body: some View{
         
@@ -80,7 +116,8 @@ struct DatePicker: View {
                         ForEach(((year-100)...year).reversed(), id:\.self) { (y) in
                             Button(action: {
                                 isDatePickerShown.toggle()
-                                self.currentDate = y
+                                self.selectedCurrentDate = y
+                                
                             }, label: {
                                 Text(String(y))
                                     .foregroundColor(Color.white)
@@ -93,9 +130,5 @@ struct DatePicker: View {
                 .padding(.vertical, 10)
                 .background(Color.gray)
                 .cornerRadius(10)
-        
-            
-            
-         
      }
 }

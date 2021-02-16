@@ -56,10 +56,10 @@
 			children = (
 				2787C2E125DA14210007DD05 /* FormValidationApp.swift */,
 				2787C2E325DA14210007DD05 /* ContentView.swift */,
+				2787C2F225DB056B0007DD05 /* Validation.swift */,
 				2787C2E525DA14250007DD05 /* Assets.xcassets */,
 				2787C2EA25DA14250007DD05 /* Info.plist */,
 				2787C2E725DA14250007DD05 /* Preview Content */,
-				2787C2F225DB056B0007DD05 /* Validation.swift */,
 			);
 			path = FormValidation;
 			sourceTree = "<group>";

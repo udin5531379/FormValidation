@@ -7,11 +7,11 @@
 
 import Foundation
 
-class Validation{
-    var email: String = ""
-    var password: String = ""
-    var retypePassword: String = ""
-    var currentDate: Int = 0
+class Validation: ObservableObject{
+    @Published var email: String = ""
+    @Published var password: String = ""
+    @Published var retypePassword: String = ""
+    @Published var chosenDate: Int = 0
     
     func doesPasswordMatch() -> Bool{
         return password == retypePassword
@@ -23,11 +23,43 @@ class Validation{
     }
     
     func isPasswordValid() -> Bool{
-        let passwordValidity = NSPredicate(format: "SELF MATCHES %@", "(?!^[0-9]*$)(?!^[a-zA-Z]*$)^([a-zA-Z0-9]{6,15})$")
+        let passwordValidity = NSPredicate(format: "SELF MATCHES %@", "^.{4,8}$")
         return passwordValidity.evaluate(with: password)
     }
     
-//    func isUserOfSuitableAge() -> Bool {
-//        
-//    }
+    func isUserOfSuitableAge() -> Bool {
+        if ((Calendar.current.component(.year, from: Date())) - chosenDate) >= 18 {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    //String according to validations
+    
+    func validEmail() -> String {
+        if isEmaiValid() {
+            return ""
+        } else {
+            return "Email is not valid"
+        }
+    }
+    
+    func  validPassword() -> String {
+        if isPasswordValid(){
+            return ""
+        } else {
+            return "Password not valid"
+        }
+    }
+    
+    func doesPasswordMatchString() -> String {
+        if doesPasswordMatch(){
+            return ""
+        } else {
+            return "Password does not match"
+        }
+     }
+    
+    
 }
